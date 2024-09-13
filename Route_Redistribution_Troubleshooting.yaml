@@ -1,0 +1,564 @@
+lab:
+  description: Route Redistribution Troubleshooting Lab - Copyright 2023, Kevin Wallace Training, LLC
+  notes: |-
+    ## Troubleshooting Issue:
+    - Router R2 should be configured for mutual route redistribution between OSPF and EIGRP autonomous systems
+    - However, router R3 cannot currently see routes in the OSPF AS.
+  title: Route Redistribution Troubleshooting
+  version: 0.0.3
+nodes:
+  - id: n0
+    label: R1
+    node_definition: iosv
+    x: 50
+    y: 211
+    configuration: |-
+      Building configuration...
+
+      Current configuration : 1543 bytes
+      !
+      ! Last configuration change at 20:24:49 UTC Wed Jul 1 2020
+      !
+      version 15.8
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      no service password-encryption
+      !
+      hostname R1
+      !
+      boot-start-marker
+      boot-end-marker
+      !
+      !
+      no logging console
+      !
+      no aaa new-model
+      !
+      !
+      !
+      mmi polling-interval 60
+      no mmi auto-configure
+      no mmi pvc
+      mmi snmp-timeout 180
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      no ip domain lookup
+      ip cef
+      ipv6 unicast-routing
+      ipv6 cef
+      !
+      multilink bundle-name authenticated
+      !
+      !
+      !
+      !
+      !
+      redundancy
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      interface GigabitEthernet0/0
+       no ip address
+       shutdown
+       duplex auto
+       speed auto
+       media-type rj45
+      !
+      interface GigabitEthernet0/1
+       ip address 192.0.2.2 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2003::1/64
+       ipv6 ospf 1 area 1
+      !
+      interface GigabitEthernet0/2
+       ip address 10.1.1.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2001::1/64
+       ipv6 ospf 1 area 1
+      !
+      interface GigabitEthernet0/3
+       ip address 10.2.2.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2002::1/64
+       ipv6 ospf 1 area 1
+      !
+      router ospf 1
+       network 0.0.0.0 255.255.255.255 area 0
+      !
+      ip forward-protocol nd
+      !
+      !
+      no ip http server
+      no ip http secure-server
+      !
+      ipv6 router ospf 1
+       router-id 1.1.1.1
+      !
+      ipv6 ioam timestamp
+      !
+      !
+      banner exec ^^
+      banner incoming ^^
+      banner login ^^
+      !
+      control-plane
+      !
+      !
+      line con 0
+       exec-timeout 0 0
+       logging synchronous
+      line aux 0
+      line vty 0 4
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      line vty 5 15
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      !
+      no scheduler allocate
+      !
+      end
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+      - id: i2
+        slot: 2
+        label: GigabitEthernet0/2
+        type: physical
+      - id: i3
+        slot: 3
+        label: GigabitEthernet0/3
+        type: physical
+  - id: n1
+    label: R2
+    node_definition: iosv
+    x: 315
+    y: 209
+    configuration: |-
+      Building configuration...
+
+      Current configuration : 1496 bytes
+      !
+      ! Last configuration change at 20:25:20 UTC Wed Jul 1 2020
+      !
+      version 15.8
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      no service password-encryption
+      !
+      hostname R2
+      !
+      boot-start-marker
+      boot-end-marker
+      !
+      !
+      no logging console
+      !
+      no aaa new-model
+      !
+      !
+      !
+      mmi polling-interval 60
+      no mmi auto-configure
+      no mmi pvc
+      mmi snmp-timeout 180
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      no ip domain lookup
+      ip cef
+      ipv6 unicast-routing
+      ipv6 cef
+      !
+      multilink bundle-name authenticated
+      !
+      !
+      !
+      !
+      !
+      redundancy
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      interface GigabitEthernet0/0
+       no ip address
+       shutdown
+       duplex auto
+       speed auto
+       media-type rj45
+      !
+      interface GigabitEthernet0/1
+       ip address 192.0.2.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2003::2/64
+       ipv6 ospf 1 area 1
+      !
+      interface GigabitEthernet0/2
+       ip address 203.0.113.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2004::1/64
+       ipv6 eigrp 1
+      !
+      !
+      router eigrp 1
+       network 203.0.113.0
+       redistribute ospf 1
+      !
+      router ospf 1
+       redistribute eigrp 1 subnets
+       network 192.0.2.0 0.0.0.255 area 0
+      !
+      ip forward-protocol nd
+      !
+      !
+      no ip http server
+      no ip http secure-server
+      !
+      ipv6 router eigrp 1
+      !
+      ipv6 router ospf 1
+       router-id 2.2.2.2
+      !
+      ipv6 ioam timestamp
+      !
+      !
+      banner exec ^^
+      banner incoming ^^
+      banner login ^^
+      !
+      control-plane
+      !
+      !
+      line con 0
+       exec-timeout 0 0
+       logging synchronous
+      line aux 0
+      line vty 0 4
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      line vty 5 15
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      !
+      no scheduler allocate
+      !
+      end
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+      - id: i2
+        slot: 2
+        label: GigabitEthernet0/2
+        type: physical
+  - id: n2
+    label: R3
+    node_definition: iosv
+    x: 629
+    y: 205
+    configuration: |-
+      Building configuration...
+
+      Current configuration : 1495 bytes
+      !
+      ! Last configuration change at 20:25:54 UTC Wed Jul 1 2020
+      !
+      version 15.8
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      no service password-encryption
+      !
+      hostname R3
+      !
+      boot-start-marker
+      boot-end-marker
+      !
+      !
+      no logging console
+      !
+      no aaa new-model
+      !
+      !
+      !
+      mmi polling-interval 60
+      no mmi auto-configure
+      no mmi pvc
+      mmi snmp-timeout 180
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      no ip domain lookup
+      ip cef
+      ipv6 unicast-routing
+      ipv6 cef
+      !
+      multilink bundle-name authenticated
+      !
+      !
+      !
+      !
+      !
+      redundancy
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      interface GigabitEthernet0/0
+       no ip address
+       shutdown
+       duplex auto
+       speed auto
+       media-type rj45
+      !
+      interface GigabitEthernet0/1
+       ip address 203.0.113.2 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2004::2/64
+       ipv6 eigrp 1
+      !
+      interface GigabitEthernet0/2
+       ip address 192.168.1.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2005::1/64
+       ipv6 eigrp 1
+      !
+      interface GigabitEthernet0/3
+       ip address 192.168.2.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2006::1/64
+       ipv6 eigrp 1
+      !
+      !
+      router eigrp 1
+       network 0.0.0.0
+      !
+      ip forward-protocol nd
+      !
+      !
+      no ip http server
+      no ip http secure-server
+      !
+      ipv6 router eigrp 1
+      !
+      ipv6 ioam timestamp
+      !
+      !
+      banner exec ^^
+      banner incoming ^^
+      banner login ^^
+      !
+      control-plane
+      !
+      !
+      line con 0
+       exec-timeout 0 0
+       logging synchronous
+      line aux 0
+      line vty 0 4
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      line vty 5 15
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      !
+      no scheduler allocate
+      !
+      end
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+      - id: i2
+        slot: 2
+        label: GigabitEthernet0/2
+        type: physical
+      - id: i3
+        slot: 3
+        label: GigabitEthernet0/3
+        type: physical
+  - id: n3
+    label: SW1
+    node_definition: unmanaged_switch
+    x: 50
+    y: 65
+    configuration: null
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 1
+        label: port1
+        type: physical
+  - id: n4
+    label: SW2
+    node_definition: unmanaged_switch
+    x: 52
+    y: 315
+    configuration: null
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 1
+        label: port1
+        type: physical
+  - id: n5
+    label: SW3
+    node_definition: unmanaged_switch
+    x: 650
+    y: 50
+    configuration: null
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 1
+        label: port1
+        type: physical
+  - id: n6
+    label: SW4
+    node_definition: unmanaged_switch
+    x: 636
+    y: 316
+    configuration: null
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 1
+        label: port1
+        type: physical
+links:
+  - id: l0
+    i1: i1
+    n1: n1
+    i2: i1
+    n2: n0
+  - id: l1
+    i1: i2
+    n1: n1
+    i2: i1
+    n2: n2
+  - id: l2
+    i1: i2
+    n1: n0
+    i2: i0
+    n2: n3
+  - id: l3
+    i1: i3
+    n1: n0
+    i2: i0
+    n2: n4
+  - id: l4
+    i1: i2
+    n1: n2
+    i2: i0
+    n2: n5
+  - id: l5
+    i1: i3
+    n1: n2
+    i2: i0
+    n2: n6

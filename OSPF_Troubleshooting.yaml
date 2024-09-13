@@ -1,0 +1,494 @@
+lab:
+  description: OSPF Troubleshooting Lab - Copyright 2023, Kevin Wallace Training, LLC
+  notes: |-
+    ## Troubleshooting Issue:
+    - None of the routers are learning OSPF routes. 
+    - Examine and correct the existing OSPF configuration on each router such that each router has full visibility to all networks.
+  title: OSPF Troubleshooting
+  version: 0.0.3
+nodes:
+  - id: n0
+    label: SW1
+    node_definition: iosvl2
+    x: 50
+    y: 50
+    configuration: null
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+  - id: n1
+    label: SW2
+    node_definition: iosvl2
+    x: 56
+    y: 494
+    configuration: null
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+  - id: n2
+    label: R1
+    node_definition: iosv
+    x: 50
+    y: 163
+    configuration: |-
+      Building configuration...
+
+      Current configuration : 1369 bytes
+      !
+      ! Last configuration change at 14:21:06 UTC Mon Jun 29 2020
+      !
+      version 15.8
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      no service password-encryption
+      !
+      hostname R1
+      !
+      boot-start-marker
+      boot-end-marker
+      !
+      !
+      no logging console
+      !
+      no aaa new-model
+      !
+      !
+      !
+      mmi polling-interval 60
+      no mmi auto-configure
+      no mmi pvc
+      mmi snmp-timeout 180
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      no ip domain lookup
+      ip cef
+      no ipv6 cef
+      !
+      multilink bundle-name authenticated
+      !
+      !
+      !
+      !
+      !
+      redundancy
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      interface GigabitEthernet0/0
+       no ip address
+       shutdown
+       duplex auto
+       speed auto
+       media-type rj45
+      !
+      interface GigabitEthernet0/1
+       ip address 192.168.1.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2000:1::1/64
+      !
+      interface GigabitEthernet0/2
+       ip address 192.0.2.1 255.255.255.252
+       ip mtu 1478
+       ip ospf 1 area 0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2000:2::1/64
+      !
+      router ospf 1
+       passive-interface GigabitEthernet0/1
+       network 192.168.1.0 0.0.0.255 area 0
+      !
+      ip forward-protocol nd
+      !
+      !
+      no ip http server
+      no ip http secure-server
+      !
+      ipv6 ioam timestamp
+      !
+      !
+      banner exec ^^
+      banner incoming ^^
+      banner login ^^
+      !
+      control-plane
+      !
+      !
+      line con 0
+       exec-timeout 0 0
+       logging synchronous
+      line aux 0
+      line vty 0 4
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      line vty 5 15
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      !
+      no scheduler allocate
+      !
+      end
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+      - id: i2
+        slot: 2
+        label: GigabitEthernet0/2
+        type: physical
+  - id: n3
+    label: R2
+    node_definition: iosv
+    x: 53
+    y: 280
+    configuration: |-
+      Building configuration...
+
+      Current configuration : 1361 bytes
+      !
+      ! Last configuration change at 14:21:40 UTC Mon Jun 29 2020
+      !
+      version 15.8
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      no service password-encryption
+      !
+      hostname R2
+      !
+      boot-start-marker
+      boot-end-marker
+      !
+      !
+      no logging console
+      !
+      no aaa new-model
+      !
+      !
+      !
+      mmi polling-interval 60
+      no mmi auto-configure
+      no mmi pvc
+      mmi snmp-timeout 180
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      no ip domain lookup
+      ip cef
+      no ipv6 cef
+      !
+      multilink bundle-name authenticated
+      !
+      !
+      !
+      !
+      !
+      redundancy
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      interface GigabitEthernet0/0
+       no ip address
+       shutdown
+       duplex auto
+       speed auto
+       media-type rj45
+      !
+      interface GigabitEthernet0/1
+       ip address 192.0.2.2 255.255.255.252
+       ip ospf hello-interval 20
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2000:2::2/64
+      !
+      interface GigabitEthernet0/2
+       ip address 203.0.113.1 255.255.255.252
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2000:3::1/64
+      !
+      router ospf 2
+       network 192.0.2.0 0.0.0.3 area 0
+       network 203.0.113.0 0.0.0.3 area 1
+      !
+      ip forward-protocol nd
+      !
+      !
+      no ip http server
+      no ip http secure-server
+      !
+      ipv6 ioam timestamp
+      !
+      !
+      banner exec ^^
+      banner incoming ^^
+      banner login ^^
+      !
+      control-plane
+      !
+      !
+      line con 0
+       exec-timeout 0 0
+       logging synchronous
+      line aux 0
+      line vty 0 4
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      line vty 5 15
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      !
+      no scheduler allocate
+      !
+      end
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+      - id: i2
+        slot: 2
+        label: GigabitEthernet0/2
+        type: physical
+  - id: n4
+    label: R3
+    node_definition: iosv
+    x: 61
+    y: 387
+    configuration: |-
+      Building configuration...
+
+      Current configuration : 1341 bytes
+      !
+      ! Last configuration change at 14:22:26 UTC Mon Jun 29 2020
+      !
+      version 15.8
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      no service password-encryption
+      !
+      hostname R3
+      !
+      boot-start-marker
+      boot-end-marker
+      !
+      !
+      no logging console
+      !
+      no aaa new-model
+      !
+      !
+      !
+      mmi polling-interval 60
+      no mmi auto-configure
+      no mmi pvc
+      mmi snmp-timeout 180
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      no ip domain lookup
+      ip cef
+      no ipv6 cef
+      !
+      multilink bundle-name authenticated
+      !
+      !
+      !
+      !
+      !
+      redundancy
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      !
+      interface GigabitEthernet0/0
+       no ip address
+       shutdown
+       duplex auto
+       speed auto
+       media-type rj45
+      !
+      interface GigabitEthernet0/1
+       ip address 203.0.113.2 255.255.255.252
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2000:3::2/64
+      !
+      interface GigabitEthernet0/2
+       ip address 172.16.1.1 255.255.255.0
+       duplex auto
+       speed auto
+       media-type rj45
+       ipv6 address 2000:4::1/64
+      !
+      router ospf 1
+       passive-interface GigabitEthernet0/1
+       network 0.0.0.0 255.255.255.255 area 0
+      !
+      ip forward-protocol nd
+      !
+      !
+      no ip http server
+      no ip http secure-server
+      !
+      ipv6 ioam timestamp
+      !
+      !
+      banner exec ^^
+      banner incoming ^^
+      banner login ^^
+      !
+      control-plane
+      !
+      !
+      line con 0
+       exec-timeout 0 0
+       logging synchronous
+      line aux 0
+      line vty 0 4
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      line vty 5 15
+       exec-timeout 0 0
+       password cisco
+       login
+       transport input none
+      !
+      no scheduler allocate
+      !
+      end
+    tags: []
+    interfaces:
+      - id: i0
+        slot: 0
+        label: GigabitEthernet0/0
+        type: physical
+      - id: i1
+        slot: 1
+        label: GigabitEthernet0/1
+        type: physical
+      - id: i2
+        slot: 2
+        label: GigabitEthernet0/2
+        type: physical
+links:
+  - id: l0
+    i1: i1
+    n1: n0
+    i2: i1
+    n2: n2
+  - id: l1
+    i1: i2
+    n1: n2
+    i2: i1
+    n2: n3
+  - id: l2
+    i1: i2
+    n1: n3
+    i2: i1
+    n2: n4
+  - id: l3
+    i1: i2
+    n1: n4
+    i2: i1
+    n2: n1
